@@ -1,0 +1,116 @@
+---
+title: "introduction"
+format: 
+  html:
+    toc: true          
+    toc-location: left 
+    toc-title: "content"  
+    toc-expand: 2      
+---
+# Introduction to grepreaper
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(data.table)
+```
+
+## Define the function
+grepreaper is an R package designed to enhance file reading by combining the power of grep for pattern matching with the efficiency of data.table::fread() for data loading. It enables users to:
+
+Quickly count lines matching a specified pattern;
+Read and return only the lines that match the pattern.
+This vignette demonstrates how to use the core functions grep_count() and grep_read().
+```{r}
+grep_count <- function(pattern, file) {
+  if (!file.exists(file)) {
+    stop("File does not exist")
+  }
+  # check file extension
+  file_ext <- tools::file_ext(file)
+  if (file_ext == "csv") {
+    # if the file is a csv file, use fread()
+    cmd <- paste("grep -c", shQuote(pattern), shQuote(file))
+    cat("Running command:", cmd, "\n")
+    result <- tryCatch(
+      as.numeric(system(cmd, intern = TRUE)),
+      error = function(e) 0
+    )
+    return(result)
+  } else {
+    # if the file is not a csv file, use system()
+    cmd <- paste("grep -c", shQuote(pattern), shQuote(file))
+    result <- as.numeric(system(cmd, intern = TRUE))
+    return(result)
+  }
+}
+
+grep_read <- function(pattern, file) {
+  if (!file.exists(file)) {
+    stop("File does not exist")
+  }
+
+  # check file extension
+  file_ext <- tools::file_ext(file)
+
+  if (file_ext == "csv") {
+    # if the file is a csv file, use fread()
+    cmd <- paste("grep", shQuote(pattern), shQuote(file))
+    result <- tryCatch(
+      data.table::fread(cmd = cmd),
+      error = function(e) data.table::data.table()
+    )
+    return(result)
+  } else {
+    # if the file is not a csv file, use system()
+    cmd <- paste("grep -n", shQuote(pattern), shQuote(file))
+    raw_lines <- tryCatch(
+      system(cmd, intern = TRUE),
+      warning = function(w) character(0),
+      error = function(e) character(0)
+    )
+
+    if (length(raw_lines) == 0) {
+      return(data.table::data.table(line = integer(), text = character()))
+    }
+    split_data <- strcapture("^([0-9]+):(.*)$", raw_lines,
+                             proto = data.frame(line = integer(),
+                                                text = character()))
+    return(data.table::as.data.table(split_data))
+  }
+}
+
+```
+
+
+## Example
+Example Data
+We use the built-in diamonds dataset from the ggplot2 package and save it to a CSV file:
+```{r}
+if (!file.exists("diamonds.csv"))fwrite(ggplot2::diamonds, "diamonds.csv")
+```
+### count lines matching a pattern
+```{r}
+count <- grep_count("VS", "diamonds.csv")
+count
+```
+### read lines matching a pattern
+```{r}
+matched_data <- grep_read("VS", "diamonds.csv")
+head(matched_data)
+
+```
+### Read from a Non-CSV File
+```{r}
+writeLines(c("apple pie", "banana split", "pineapple tart", "apple juice"),
+           "fruits.txt")
+
+# Match "apple"
+txt_result <- grep_read("apple", "fruits.txt")
+txt_result
+
+```
+
+
+
