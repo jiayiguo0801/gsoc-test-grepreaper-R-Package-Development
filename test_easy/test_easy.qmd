@@ -1,5 +1,5 @@
 ---
-title: "gsoc-test-grepreaper"
+title: "test_easy"
 format: html
 ---
 Easy: Consider the diamonds data from the ggplot2 package:
@@ -14,9 +14,15 @@ data(diamonds)
 ```
 ```{r}
 print(diamonds)
-number <- grep('VS', diamonds$clarity) |>
+number_VS <- grep('VS', diamonds$clarity) |>
   length()
-cat('Number of qualifying rows:', number)
+cat('Number of VS patten', number_VS, "\n")
+number_VVS <- grep('VVS', diamonds$clarity) |>
+  length() 
+cat('Number of VVS patten:', number_VVS, "\n")
+number_VSlevel <- grep('^VS', diamonds$clarity) |>
+  length()
+cat('Number of VS level(including VS1 & VS2:', number_VSlevel, "\n")
 ```
 
 

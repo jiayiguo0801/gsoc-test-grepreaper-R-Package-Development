@@ -11,10 +11,19 @@ use fread() to read the data "diamonds"
 ```{r}
 data(diamonds) 
 if(!file.exists("diamonds.csv")) fwrite(diamonds, "diamonds.csv")
-number <- fread(cmd = "grep 'VS' diamonds.csv") |>
+number_VS <- fread(cmd = "grep VS diamonds.csv") |>
   nrow() |>
   print()
-cat("Number of rows that match the pattern 'VS':", number, "\n")
+cat("Number of rows that match the pattern VS:", number_VS, "\n")
+number_VVS <- fread(cmd = "grep VVS diamonds.csv") |>
+  nrow() |>
+  print()
+cat("Number of rows that match the pattern VVS:", number_VVS, "\n")
+number_VSlevel <- fread(cmd = "grep -E ',VS[12],' diamonds.csv") |>
+  nrow() |>
+  print()
+cat("Number of rows that match VS levels:", number_VSlevel, "\n")
+
 ```
 
 
