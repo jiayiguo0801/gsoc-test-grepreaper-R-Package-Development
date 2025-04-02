@@ -1,0 +1,20 @@
+---
+title: "test_medium"
+format: html
+---
+Medium: Within the data.table package, write a call to fread() that feeds a command-line grep statement into the cmd parameter. Use this to count the number of rows that match the pattern 'VS'.
+```{r}
+library(ggplot2)
+library(data.table)
+```
+use fread() to read the data "diamonds"
+```{r}
+data(diamonds) 
+if(!file.exists("diamonds.csv")) fwrite(diamonds, "diamonds.csv")
+number <- fread(cmd = "grep 'VS' diamonds.csv") |>
+  nrow() |>
+  print()
+cat("Number of rows that match the pattern 'VS':", number, "\n")
+```
+
+
