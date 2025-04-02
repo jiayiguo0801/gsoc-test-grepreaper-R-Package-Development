@@ -1,0 +1,22 @@
+---
+title: "gsoc-test-grepreaper"
+format: html
+---
+Easy: Consider the diamonds data from the ggplot2 package:
+
+library(ggplot2) library(data.table) data(diamonds)
+
+Within R, use a call to the grep() function to identify rows of data that match the pattern 'VS'. Count the number of qualifying rows.
+```{r}
+library(ggplot2)
+library(data.table)
+data(diamonds)
+```
+```{r}
+print(diamonds)
+number <- grep('VS', diamonds$clarity) |>
+  length()
+cat('Number of qualifying rows:', number)
+```
+
+
